@@ -22,12 +22,17 @@ class Board():
                       'H5': ' ', 'H6': ' ', 'H7': 'P', 'H8': 'R'}
 
 
-    def __repr__(self):
+    def __str__(self):
         lines = []
         for n in '87654321':
             fields = [self.board[a + n] for a in 'ABCDEFGH']
             lines.append(' '.join(fields))
-        return '\n'.join(lines)
+        board = '\n'.join(lines)
+        pieces = {'p': '♙', 'P': '♟', 'r': '♖', 'R': '♜', 'n': '♘', 'N': '♞',
+                  'b': '♗', 'B': '♝', 'q': '♕', 'Q': '♛', 'k': '♔', 'K': '♚'}
+        for piece in pieces:
+            board = board.replace(piece, pieces[piece])
+        return board
 
 
 def main():
