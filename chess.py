@@ -1,6 +1,7 @@
 #/usr/bin/python
 #coding=utf8
 
+import sys
 
 class Board():
     def __init__(self):
@@ -26,18 +27,45 @@ class Board():
         lines = []
         for n in '87654321':
             fields = [self.board[a + n] for a in 'ABCDEFGH']
-            lines.append(' '.join(fields))
+            lines.append(n + ' ' + ' '.join(fields))
         board = '\n'.join(lines)
         pieces = {'p': '♙', 'P': '♟', 'r': '♖', 'R': '♜', 'n': '♘', 'N': '♞',
                   'b': '♗', 'B': '♝', 'q': '♕', 'Q': '♛', 'k': '♔', 'K': '♚'}
         for piece in pieces:
             board = board.replace(piece, pieces[piece])
+        board += '\n  %s' % ' '.join('ABCDEFGH')
         return board
 
 
-def main():
-    print Board()
+    def move(self, move):
+        '''If the move is legal, update the board with the new positions.'''
+        try:
+            piece = self.board[move[0]]
+            self.board[move[0]] = ' '
+            self.board[move[1]] = piece
+        except KeyError as error:
+            print 'Invalid move: %s.' % error
 
+
+    def legal(self, motion):
+        '''Return True if the motion is legal, otherwise return False.'''
+        pass
+
+
+def main():
+    board = Board()
+    print board
+    while True:
+        try:
+            move = raw_input('Enter a move: ')
+            if move:
+                board.move(move.upper().split('-'))
+            print
+            print board
+            print
+        except (KeyboardInterrupt, EOFError):
+            print
+            sys.exit()
 
 if __name__ == '__main__':
     main()
