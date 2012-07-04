@@ -9,11 +9,11 @@ class Board():
 
     def __repr__(self):
         board = Board().draw_board()
-        temp = []
+        lines = []
         for n in '87654321':
             fields = [board[a + n] for a in 'ABCDEFGH']
-            temp.append(' '.join(fields))
-        return '\n'.join(temp)
+            lines.append(' '.join(fields))
+        return '\n'.join(lines)
 
 
     def draw_board(self):
