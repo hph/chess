@@ -37,19 +37,29 @@ class Board():
         return board
 
 
+    def __getitem__(self, val):
+        return self.board.get(val)
+
+
     def move(self, move):
         '''If the move is legal, update the board with the new positions.'''
+        # TODO Call legal within this method.
         try:
             piece = self.board[move[0]]
             self.board[move[0]] = ' '
             self.board[move[1]] = piece
         except KeyError as error:
-            print 'Invalid move: %s.' % error
+            print 'Invalid move: %s. Use the form "E2-E4".' % error
 
 
-    def legal(self, motion):
-        '''Return True if the motion is legal, otherwise return False.'''
+def legal(move, turn, board):
+    '''Return True if the move is legal, otherwise return False.'''
+    piece = move[:2]
+    if piece in 'pP':
         pass
+    elif piece in 'rR':
+        pass
+    # etc
 
 
 def main():
@@ -59,7 +69,7 @@ def main():
         try:
             move = raw_input('Enter a move: ')
             if move:
-                board.move(move.upper().split('-'))
+                board.move(move)
             print
             print board
             print
