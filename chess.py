@@ -37,17 +37,17 @@ class Board():
         return board
 
 
-    def __getitem__(self, val):
-        return self.board.get(val)
+    def __getitem__(self, piece):
+        return self.board.get(piece)
 
 
     def move(self, move):
         '''If the move is legal, update the board with the new positions.'''
         # TODO Call legal within this method.
         try:
-            piece = self.board[move[0]]
-            self.board[move[0]] = ' '
-            self.board[move[1]] = piece
+            piece = self.board[move[:2]]
+            self.board[move[:2]] = ' '
+            self.board[move[3:]] = piece
         except KeyError as error:
             print 'Invalid move: %s. Use the form "E2-E4".' % error
 
