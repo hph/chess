@@ -2,6 +2,10 @@
 #coding=utf8
 
 import sys
+import os
+
+
+PIECES = {'white': 'prnbkq', 'black': 'PRNBQK'}
 
 class Board():
     def __init__(self):
@@ -25,12 +29,12 @@ class Board():
 
     def __str__(self):
         lines = []
+        pieces = {'p': '♙', 'P': '♟', 'r': '♖', 'R': '♜', 'n': '♘', 'N': '♞',
+                  'b': '♗', 'B': '♝', 'q': '♕', 'Q': '♛', 'k': '♔', 'K': '♚'}
         for n in '87654321':
             fields = [self.board[a + n] for a in 'ABCDEFGH']
             lines.append(n + ' ' + ' '.join(fields))
         board = '\n'.join(lines)
-        pieces = {'p': '♙', 'P': '♟', 'r': '♖', 'R': '♜', 'n': '♘', 'N': '♞',
-                  'b': '♗', 'B': '♝', 'q': '♕', 'Q': '♛', 'k': '♔', 'K': '♚'}
         for piece in pieces:
             board = board.replace(piece, pieces[piece])
         board += '\n  %s' % ' '.join('ABCDEFGH')
@@ -47,29 +51,81 @@ class Board():
         try:
             piece = self.board[move[:2]]
             self.board[move[:2]] = ' '
-            self.board[move[3:]] = piece
+            self.board[move[2:]] = piece
         except KeyError as error:
-            print 'Invalid move: %s. Use the form "E2-E4".' % error
+            print 'Invalid move: %s. Use the form "E2E4".' % error
 
 
-def legal(move, turn, board):
+def motion(move):
+    '''Return the number of fields moved in the grid.'''
+    chars = {'A': 1, 'B': 2, 'C': 3, 'D': 4, 'E': 5, 'F': 6, 'G': 7, 'H': 8}
+    start = move[:2]
+    end = move[2:]
+    x_axis = end[start[0]] - start[end[0]]
+    y_axis = int(end[1]) - int(start[1])
+    return x_axis, y_axis
+
+
+def legal(move, piece, turn, board):
     '''Return True if the move is legal, otherwise return False.'''
-    piece = move[:2]
+    # Use the king function before and after a move.
+    # Return False if trying to move a piece of the opposite team.
+    target = board[move[2:]]
+    pieces = PIECES[turn]
+    # Return False if trying to move no piece or an enemies piece and if the
+    # target field contains an allied piece.
+    if any([piece not in pieces, target in pieces]):
+        print 'Illegal move, %s\'s turn.' % turn
+        return False
     if piece in 'pP':
-        pass
+        movement = motion(move)
+        if turn == 'white':
+            if move[2:] != ' ':
+                if movement not in [(-1, 1), (1, 1)]:
+                    return False
+            elif movement == (0, 2) and move[1] != '2':
+                return False
+            elif movement == (0, 1) and board[move[2:]] != ' ':
+                return False
+        else:
+            pass
     elif piece in 'rR':
         pass
-    # etc
+    elif piece in 'nN':
+        pass
+    elif piece in 'bB':
+        pass
+    elif piece in 'qQ':
+        pass
+    elif piece in 'kK':
+        pass
+    return True
+
+
+def king():
+    # Check whether the king is being threatened before the next move, whether
+    # he can be protected if he is (if he can't be protected the game is over)
+    # and check whether the next move leaves him in check.
+    # Return False if the king is threatened or if the move leaves him
+    # threatened, return None if the game is over (the king is being threatened
+    # and cannot be defended) and True if none of this applies.
+    pass
 
 
 def main():
     board = Board()
     print board
+    turn = 'white'
     while True:
+        move = raw_input('Enter a move: ').upper()
         try:
-            move = raw_input('Enter a move: ')
+            os.system('clear')
             if move:
-                board.move(move)
+                piece = board[move[:2]]
+                if legal(move, piece, turn, board):
+                    board.move(move)
+                    turn = 'black' if turn == 'white' else 'white'
+                    print turn
             print
             print board
             print
