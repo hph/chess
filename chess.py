@@ -56,14 +56,40 @@ class Board():
             print 'Invalid move: %s. Use the form "E2E4".' % error
 
 
-def motion(move):
+def motion(move, turn):
     '''Return the number of fields moved in the grid.'''
     chars = {'A': 1, 'B': 2, 'C': 3, 'D': 4, 'E': 5, 'F': 6, 'G': 7, 'H': 8}
     start = move[:2]
     end = move[2:]
-    x_axis = end[start[0]] - start[end[0]]
+    x_axis = int(chars[start[0]]) - int(chars[end[0]])
     y_axis = int(end[1]) - int(start[1])
-    return x_axis, y_axis
+    if turn == 'white':
+        return x_axis, y_axis
+    else:
+        return x_axis, -y_axis
+
+
+def clear_path(board, move, piece, turn):
+    '''Return True if there are no pieces between the start and endpoints,
+    otherwise return False.'''
+    if piece in 'pP':
+        if turn == 'white':
+            plus = 1
+        elif turn == 'black':
+            plus = -1
+        jump = move[0] + str(int(move[1]) + plus)
+        if board[jump] == ' ':
+            return True
+    if piece in 'rR':
+        return True
+    if piece in 'nN':
+        return True
+    if piece in 'bB':
+        return True
+    if piece in 'qQ':
+        return True
+    if piece in 'kK':
+        return True
 
 
 def legal(move, piece, turn, board):
@@ -72,32 +98,49 @@ def legal(move, piece, turn, board):
     # Return False if trying to move a piece of the opposite team.
     target = board[move[2:]]
     pieces = PIECES[turn]
+    opposite = PIECES['black'] if turn == 'white' else PIECES['white']
     # Return False if trying to move no piece or an enemies piece and if the
     # target field contains an allied piece.
     if any([piece not in pieces, target in pieces]):
         print 'Illegal move, %s\'s turn.' % turn
         return False
+    movement = motion(move, turn)
+    print movement
     if piece in 'pP':
-        movement = motion(move)
-        if turn == 'white':
-            if move[2:] != ' ':
-                if movement not in [(-1, 1), (1, 1)]:
-                    return False
-            elif movement == (0, 2) and move[1] != '2':
+        if target in opposite:
+            # Pawns can only kill with a diagonal move by one square.
+            if movement not in [(-1, 1), (1, 1)]:
                 return False
-            elif movement == (0, 1) and board[move[2:]] != ' ':
-                return False
+        if movement == (0, 1):
+            return True
+        if movement == (0, 2):
+            if clear_path(board, move, piece, turn):
+                if any([turn == 'white' and move[1] == '2',
+                        turn == 'black' and move[1] == '7']):
+                    return True
+        return False
+    if piece in 'rR':
+        # Rooks can only move in a horizontal or vertical line.
+        if any([movement[0] == 0 and movement[1] != 0,
+                movement[0] != 0 and movement[1] == 0]):
+            if clear_path(board, move, piece, turn):
+                return True
+        # Invalid rook move.
         else:
-            pass
-    elif piece in 'rR':
+            return False
+    if piece in 'nN':
         pass
-    elif piece in 'nN':
+    if piece in 'bB':
+        # Bishops move diagonally so the absolute values of the axes should be
+        # equal.
+        if abs(movement[0]) == abs(movement[1]):
+            if clear_path(board, move, piece, turn):
+                return True
+        else:
+            return False
+    if piece in 'qQ':
         pass
-    elif piece in 'bB':
-        pass
-    elif piece in 'qQ':
-        pass
-    elif piece in 'kK':
+    if piece in 'kK':
         pass
     return True
 
